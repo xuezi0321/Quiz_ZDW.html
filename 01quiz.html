@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>词汇练习</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4fa;
+      margin: 0; padding: 20px;
+      color: #333;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #3b5998;
+    }
+    button {
+      margin: 5px 8px 20px 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: #3b5998;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #2d4373;
+    }
+    .section {
+      margin-bottom: 30px;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    .question p {
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    label {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    input[type="text"] {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 240px;
+      font-size: 1rem;
+    }
+    .correct {
+      color: green;
+      font-weight: 700;
+    }
+    .wrong {
+      color: red;
+      font-weight: 700;
+    }
+    .result {
+      margin-top: 15px;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>词汇练习</h1>
+
+<div style="text-align:center;">
+  <button id="showAllBtn">全部题目</button>
+  <button id="redoWrongBtn">重做错题</button>
+  <button id="clearWrongBtn">清除错题</button>
+  <button id="submitBtn">提交答案</button>
+</div>
+
+<div class="section" id="mcContainer">
+  <h2>选择题</h2>
+</div>
+
+<div class="section" id="engChiMatchingContainer">
+  <h2>英汉配对题</h2>
+</div>
+
+<div class="section" id="resultContainer" style="display:none;"></div>
+
+<script>
+const quizData = {
+  multipleChoice: [
+    { id: 1, question: "He applied for a _____ to protect his invention.", options: ["patent", "bucket", "lane", "sample"], answer: "patent" },
+    { id: 2, question: "The car changed to the left _____ to overtake the truck.", options: ["lane", "route", "hectare", "axis"], answer: "lane" },
+    { id: 3, question: "All students are encouraged to _____ in the science fair.", options: ["participate", "derive", "toast", "filter"], answer: "participate" },
+    { id: 4, question: "During the storm, people sought _____ in the subway station.", options: ["shelter", "garment", "replacement", "bucket"], answer: "shelter" },
+    { id: 5, question: "They _____ to the happy couple at the wedding reception.", options: ["toast", "relay", "fulfill", "bypass"], answer: "toast" },
+    { id: 6, question: "The farm covers about five _____ of land.", options: ["hectares", "grains", "buckets", "routes"], answer: "hectares" },
+    { id: 7, question: "He double-checked the figures _____ there be any mistakes.", options: ["lest", "hence", "rapid", "punctual"], answer: "lest" },
+    { id: 8, question: "The city has seen _____ development in recent years.", options: ["rapid", "stale", "vacant", "concrete"], answer: "rapid" },
+    { id: 9, question: "Many English words _____ from Latin origins.", options: ["derive", "estimate", "filter", "relay"], answer: "derive" },
+    { id: 10, question: "A single _____ of sand fell through the hourglass.", options: ["grain", "peach", "sample", "dioxide"], answer: "grain" },
+    { id: 11, question: "He carried water in a large _____ from the well.", options: ["bucket", "shelter", "hardware", "monster"], answer: "bucket" },
+    { id: 12, question: "The road was icy; _____ we drove very carefully.", options: ["hence", "lest", "punctual", "compatible"], answer: "hence" },
+    { id: 13, question: "As a respected _____, he negotiated peace between the nations.", options: ["statesman", "pedestrian", "merchant", "replacement"], answer: "statesman" },
+    { id: 14, question: "Being _____ is essential for business meetings.", options: ["punctual", "well-off", "clear-cut", "Confucian"], answer: "punctual" },
+    { id: 15, question: "The _____ waited for the green light to cross the street.", options: ["pedestrian", "zoology", "orchestra", "statesman"], answer: "pedestrian" },
+    { id: 16, question: "Can you _____ how much paint we need for this room?", options: ["estimate", "bypass", "fulfill", "adjust"], answer: "estimate" },
+    { id: 17, question: "We need _____ evidence to support this theory.", options: ["concrete", "stale", "vacant", "rapid"], answer: "concrete" },
+    { id: 18, question: "The machine helps _____ impurities from the water.", options: ["filter", "derive", "participate", "relay"], answer: "filter" },
+    { id: 19, question: "What's the shortest _____ to the airport from here?", options: ["route", "lane", "axis", "hectare"], answer: "route" },
+    { id: 20, question: "She bit into a juicy _____ from the orchard.", options: ["peach", "grain", "sample", "bucket"], answer: "peach" },
+    { id: 21, question: "Books in the library are organized by _____.", options: ["category", "strategy", "proposition", "riddle"], answer: "category" },
+    { id: 22, question: "The satellite will _____ signals to remote areas.", options: ["relay", "toast", "bypass", "filter"], answer: "relay" },
+    { id: 23, question: "Their marketing _____ increased sales by 30%.", options: ["strategy", "category", "improvement", "replacement"], answer: "strategy" },
+    { id: 24, question: "The fashion show featured an elegant silk _____.", options: ["garment", "hardware", "monster", "sample"], answer: "garment" },
+    { id: 25, question: "The _____ tuned their instruments before the concert.", options: ["orchestra", "zoology", "Confucian", "estate"], answer: "orchestra" },
+    { id: 26, question: "This software is _____ with all operating systems.", options: ["compatible", "punctual", "vacant", "stale"], answer: "compatible" },
+    { id: 27, question: "We can _____ the city center to avoid traffic.", options: ["bypass", "derive", "estimate", "fulfill"], answer: "bypass" },
+    { id: 28, question: "_____ teachings emphasize filial piety.", options: ["Confucian", "clear-cut", "well-off", "concrete"], answer: "Confucian" },
+    { id: 29, question: "The mountains provided a _____ outline against the sky.", options: ["clear-cut", "rapid", "compatible", "punctual"], answer: "clear-cut" },
+    { id: 30, question: "Computer _____ includes physical components like CPUs.", options: ["hardware", "software", "garment", "sample"], answer: "hardware" },
+    { id: 31, question: "The _____ traded spices along the ancient Silk Road.", options: ["merchant", "statesman", "pedestrian", "replacement"], answer: "merchant" },
+    { id: 32, question: "Please try this free _____ of our new product.", options: ["sample", "grain", "peach", "dioxide"], answer: "sample" },
+    { id: 33, question: "The parking space was _____ when we arrived.", options: ["vacant", "stale", "concrete", "rapid"], answer: "vacant" },
+    { id: 34, question: "We hired a temporary _____ while she's on leave.", options: ["replacement", "improvement", "category", "proposition"], answer: "replacement" },
+    { id: 35, question: "The movie featured a terrifying sea _____.", options: ["monster", "riddle", "axis", "dioxide"], answer: "monster" },
+    { id: 36, question: "The bread became _____ after just one day.", options: ["stale", "clear-cut", "well-off", "vacant"], answer: "stale" },
+    { id: 37, question: "Can you solve this ancient _____ from Greek mythology?", options: ["riddle", "proposition", "axis", "zoology"], answer: "riddle" },
+    { id: 38, question: "Carbon _____ is a major greenhouse gas.", options: ["dioxide", "monoxide", "grain", "sample"], answer: "dioxide" },
+    { id: 39, question: "The Earth rotates around its _____.", options: ["axis", "route", "lane", "hectare"], answer: "axis" },
+    { id: 40, question: "The committee considered his business _____.", options: ["proposition", "strategy", "category", "riddle"], answer: "proposition" },
+    { id: 41, question: "She inherited a large country _____.", options: ["estate", "hectare", "shelter", "orchestra"], answer: "estate" },
+    { id: 42, question: "He specialized in _____ during his biology degree.", options: ["zoology", "orchestra", "hardware", "garment"], answer: "zoology" },
+    { id: 43, question: "They live in a _____ neighborhood with expensive homes.", options: ["well-off", "punctual", "compatible", "Confucian"], answer: "well-off" },
+    { id: 44, question: "She worked hard to _____ her childhood ambition.", options: ["fulfill", "bypass", "derive", "estimate"], answer: "fulfill" },
+    { id: 45, question: "There's been a significant _____ in air quality.", options: ["improvement", "replacement", "category", "proposition"], answer: "improvement" }
+  ],
+  engChiMatching: [
+    { id: 1, english: "patent", chinese: "专利" },
+    { id: 2, english: "lane", chinese: "车道" },
+    { id: 3, english: "participate", chinese: "参与" },
+    { id: 4, english: "shelter", chinese: "避难所" },
+    { id: 5, english: "toast", chinese: "举杯祝酒" },
+    { id: 6, english: "hectare", chinese: "公顷" },
+    { id: 7, english: "lest", chinese: "以免" },
+    { id: 8, english: "rapid", chinese: "快速的" },
+    { id: 9, english: "derive", chinese: "获得；导出" },
+    { id: 10, english: "grain", chinese: "谷粒" },
+    { id: 11, english: "bucket", chinese: "水桶" },
+    { id: 12, english: "hence", chinese: "因此" },
+    { id: 13, english: "statesman", chinese: "政治家" },
+    { id: 14, english: "punctual", chinese: "准时的" },
+    { id: 15, english: "pedestrian", chinese: "行人" },
+    { id: 16, english: "estimate", chinese: "估计" },
+    { id: 17, english: "concrete", chinese: "具体的" },
+    { id: 18, english: "filter", chinese: "过滤" },
+    { id: 19, english: "route", chinese: "路径" },
+    { id: 20, english: "peach", chinese: "桃子" },
+    { id: 21, english: "category", chinese: "种类" },
+    { id: 22, english: "relay", chinese: "转播" },
+    { id: 23, english: "strategy", chinese: "战略" },
+    { id: 24, english: "garment", chinese: "衣服" },
+    { id: 25, english: "orchestra", chinese: "管弦乐队" },
+    { id: 26, english: "compatible", chinese: "兼容的" },
+    { id: 27, english: "bypass", chinese: "绕过" },
+    { id: 28, english: "Confucian", chinese: "儒家的" },
+    { id: 29, english: "clear-cut", chinese: "轮廓清晰的" },
+    { id: 30, english: "hardware", chinese: "硬件" },
+    { id: 31, english: "merchant", chinese: "商人" },
+    { id: 32, english: "sample", chinese: "样品" },
+    { id: 33, english: "vacant", chinese: "空的" },
+    { id: 34, english: "replacement", chinese: "替代者" },
+    { id: 35, english: "monster", chinese: "怪物" },
+    { id: 36, english: "stale", chinese: "不新鲜的" },
+    { id: 37, english: "riddle", chinese: "谜语" },
+    { id: 38, english: "dioxide", chinese: "二氧化物" },
+    { id: 39, english: "axis", chinese: "轴线" },
+    { id: 40, english: "proposition", chinese: "命题；提议" },
+    { id: 41, english: "estate", chinese: "不动产" },
+    { id: 42, english: "zoology", chinese: "动物学" },
+    { id: 43, english: "well-off", chinese: "手头宽裕的" },
+    { id: 44, english: "fulfill", chinese: "完成" },
+    { id: 45, english: "improvement", chinese: "改进" }
+  ]
+};
+
+
+// 本地存错题
+let wrongRecord = { mc: [], engChi: [] };
+function shuffle(arr) {
+  for(let i=arr.length-1; i>0; i--) {
+    let j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function renderMC(questions) {
+  const container = document.getElementById("mcContainer");
+  container.innerHTML = "<h2>选择题</h2>";
+  questions.forEach(q => {
+    // 复制并打乱选项数组（关键修改）
+    const shuffledOptions = [...q.options];
+    shuffle(shuffledOptions);
+    
+    let qDiv = document.createElement("div");
+    qDiv.className = "question";
+    // 使用打乱后的选项数组
+    let optionsHTML = shuffledOptions.map(opt => 
+      `<label><input type="radio" name="mc-${q.id}" value="${opt}">${opt}</label>`
+    ).join(" ");
+    qDiv.innerHTML = `<p>${q.id}. ${q.question}</p>${optionsHTML}`;
+    container.appendChild(qDiv);
+  });
+}
+
+function renderEngChi(questions) {
+  const container = document.getElementById("engChiMatchingContainer");
+  container.innerHTML = "<h2>英汉配对题</h2>";
+
+  let chOptions = questions.map(q => q.chinese);
+  shuffle(chOptions);
+
+  questions.forEach(q => {
+    let qDiv = document.createElement("div");
+    qDiv.className = "question";
+    qDiv.innerHTML = `
+      <p>${q.id}. ${q.english}</p>
+      <input type="text" id="engChi-${q.id}" placeholder="请输入对应中文" autocomplete="off" />
+      <select id="selectEngChi-${q.id}" style="margin-left:10px;">
+        <option value="">选择或输入</option>
+        ${chOptions.map(c => `<option value="${c}">${c}</option>`).join('')}
+      </select>
+    `;
+    container.appendChild(qDiv);
+
+    let select = qDiv.querySelector(`#selectEngChi-${q.id}`);
+    let input = qDiv.querySelector(`#engChi-${q.id}`);
+    select.addEventListener("change", e => {
+      input.value = e.target.value;
+    });
+  });
+}
+
+function handleSubmit() {
+  let mcWrong = [];
+  let engChiWrong = [];
+
+  quizData.multipleChoice.forEach(q => {
+    let radios = document.getElementsByName(`mc-${q.id}`);
+    let selected = null;
+    for(let r of radios) {
+      if(r.checked) {
+        selected = r.value;
+        break;
+      }
+    }
+    if(selected !== q.answer) mcWrong.push(q.id);
+  });
+
+  quizData.engChiMatching.forEach(q => {
+    let input = document.getElementById(`engChi-${q.id}`);
+    if(!input) return;
+    let val = input.value.trim().toLowerCase();
+    let correct = q.chinese.trim().toLowerCase();
+    if(val !== correct) engChiWrong.push(q.id);
+  });
+
+  wrongRecord.mc = [...new Set(mcWrong)];
+  wrongRecord.engChi = [...new Set(engChiWrong)];
+  saveWrongRecord();
+
+  showResult(mcWrong, engChiWrong);
+}
+
+function showResult(mcWrong, engChiWrong) {
+  const container = document.getElementById("resultContainer");
+  container.style.display = "block";
+  let total = quizData.multipleChoice.length + quizData.engChiMatching.length;
+  let wrongCount = mcWrong.length + engChiWrong.length;
+  let correctCount = total - wrongCount;
+
+  container.innerHTML = `
+    <p class="result">总题数：${total}</p>
+    <p class="result" style="color:green">答对：${correctCount}</p>
+    <p class="result" style="color:red">答错：${wrongCount}</p>
+  `;
+
+  if(wrongCount === 0) {
+    container.innerHTML += `<p class="correct">全部答对，棒极了！🎉</p>`;
+  } else {
+    container.innerHTML += `<p class="wrong">请重做错题，巩固记忆！</p>`;
+  }
+}
+
+function saveWrongRecord() {
+  localStorage.setItem("wrongIds", JSON.stringify(wrongRecord));
+}
+
+function loadWrongRecord() {
+  let rec = localStorage.getItem("wrongIds");
+  if(rec) {
+    try {
+      wrongRecord = JSON.parse(rec);
+    } catch {
+      wrongRecord = { mc: [], engChi: [] };
+    }
+  }
+}
+
+function showAll() {
+  renderMC(quizData.multipleChoice);
+  renderEngChi(quizData.engChiMatching);
+  document.getElementById("resultContainer").style.display = "none";
+}
+
+function redoWrong() {
+  if(!wrongRecord.mc.length && !wrongRecord.engChi.length) {
+    alert("没有错题记录，先做题吧！");
+    return;
+  }
+  let mcQs = quizData.multipleChoice.filter(q => wrongRecord.mc.includes(q.id));
+  let engChiQs = quizData.engChiMatching.filter(q => wrongRecord.engChi.includes(q.id));
+  renderMC(mcQs);
+  renderEngChi(engChiQs);
+  document.getElementById("resultContainer").style.display = "none";
+}
+
+function clearWrong() {
+  if(confirm("确定要清除错题记录吗？")) {
+    wrongRecord = { mc: [], engChi: [] };
+    saveWrongRecord();
+    alert("错题记录已清除！");
+  }
+}
+
+function init() {
+  loadWrongRecord();
+  showAll();
+
+  document.getElementById("showAllBtn").onclick = showAll;
+  document.getElementById("redoWrongBtn").onclick = redoWrong;
+  document.getElementById("clearWrongBtn").onclick = clearWrong;
+  document.getElementById("submitBtn").onclick = handleSubmit;
+}
+
+window.onload = init;
+</script>
+
+</body>
+</html>
